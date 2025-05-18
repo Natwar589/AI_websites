@@ -1,16 +1,19 @@
-const express = require('express');
+import dotenv from 'dotenv';
+import express from 'express';
+import connectDB from './src/dbConnnection.js';
+import authRoutes from './src/routes/authRoutes.js';
+dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
-
-// Middleware to parse JSON bodies
 app.use(express.json());
-
-// Basic route for testing
-app.get('/', (req, res) => {
-  res.send('Server is running');
+app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  console.log('Request Body:', req.body);
+  console.log('Content-Type:', req.headers['content-type']);
+  next();
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+connectDB()
+app.use('/api/auth', authRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
